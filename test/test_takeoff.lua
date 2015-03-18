@@ -1,27 +1,44 @@
---Boucle de contrôle du drone + affichage vidéo
-
+-- Test des commandes de décollage et d'atterissage (avec contrôle des navdatas)
 l=require("libjakopter")
 l.connect()
---Canal de com navdata (lecture des données)
-ccn = l.get_cc(1)
---Envoi des navdata au module vidéo
---vérifier le timestamp pour voir si de nouvelles données sont arrivées
---tt = l.get_cc_time(ccv)
+
 alt = 0
 -- Décollage
 l.takeoff()
---while alt < 1000 do
+alt = l.cc_read_int(1, 4)
+print("Altitude :", alt)
+
+-- Descente
+l.move(0,0,-0.2,0)
+while alt > 650 do
 	-- enregistre la hauteur
-	alt = l.read_int(ccn, 4)
-	print("Altitude :", alt)
---end
+	alt = l.cc_read_int(1, 4)
+end
+
+l.land()
+while alt > 10 do
+	-- enregistre la hauteur
+	alt = l.cc_read_int(1, 4)
+end
+
+print("Altitude :", alt)
+l.takeoff()
+
+-- Montée
+l.move(0,0,0.5,0)
+while alt < 1700 do
+	-- enregistre la hauteur
+	alt = l.cc_read_int(1, 4)
+end
+
+print("Altitude :", alt)
 
 -- Atterissage
 l.land()
---while alt > 10 do
+print("Atterissage")
+while alt > 10 do
 	-- enregistre la hauteur
-	alt = l.read_int(ccn, 4)
-	print("Altitude :", alt)
---end
+	alt = l.cc_read_int(1, 4)
+end
 
 l.disconnect()
